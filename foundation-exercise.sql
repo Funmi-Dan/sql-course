@@ -6,7 +6,7 @@ This lists 44 patients admitted to London hospitals over 5 days between Feb 26th
 */
 
 SELECT
-	ps.PatientId
+    ps.PatientId
     , ps.AdmittedDate
     , ps.DischargeDate
     , DATEADD(WEEK, -2, ps.AdmittedDate) AS ReminderDate
@@ -14,13 +14,43 @@ SELECT
     , DATEDIFF(DAY, ps.AdmittedDate, ps.DischargeDate) AS LengthOfStay
     , ps.Hospital
     , ps.Ward
+    , ps.Tariff
 FROM
-	PatientStay ps
+    PatientStay ps
 WHERE ps.Hospital IN ('Kingston', 'PRUH')
-	AND ps.Ward like '%Surgery'
-	AND ps.AdmittedDate BETWEEN '2024-02-27' AND '2024-03-01'
+    AND ps.Ward like '%Surgery'
+    AND ps.AdmittedDate BETWEEN '2024-02-27' AND '2024-03-01'
 ORDER BY ps.AdmittedDate ASC, ps.DischargeDate ASC
- 
+
+
+SELECT top 5
+    ps.Hospital
+    , ps.Ward
+    , COUNT(*) AS NumberOfPatients
+    , SUM(ps.Tariff) AS Totaltariff
+    , AVG(ps.Tariff) AS AverageTariff
+FROM
+    PatientStay ps
+GROUP BY ps.Hospital, ps.Ward
+ORDER BY Totaltariff DESC
+
+SELECT *
+FROM DimHospital
+
+Select
+    ps.PatientId
+   , ps.AdmittedDate
+   , ps.Hospital
+    , h.Hospital
+   , h.HospitalType
+   , h.Reach
+   , h.HospitalSize
+FROM
+    PatientStay ps LEFT JOIN DimHospitalBad h ON ps.Hospital = h.Hospital
+
+
+
+
 
 /*
 1. Filter the list the patients to show only those  -
